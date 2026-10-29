@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Suppressor · Login</title>
+<style>
+  body { background:#05080f; color:#e2e8f0; font-family:sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+  .card { background:#0d131f; border:1px solid #1f2a3f; border-radius:16px; padding:40px; max-width:420px; width:100%; text-align:center; }
+  h1 { background:linear-gradient(90deg,#06b6d4,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:24px; margin-bottom:10px;}
+  p { color:#64748b; font-size:14px; margin-bottom:20px; }
+  .btn { display:block; width:100%; padding:14px; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-weight:700; font-size:15px; cursor:pointer; margin-top:20px; text-decoration:none; box-sizing: border-box;}
+  .btn:hover { opacity:.9; }
+  .status { margin-top:16px; font-size:13px; color:#64748b; }
+  .ok { color:#10b981; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>⚡ QUANTUM SUPPRESSOR</h1>
+  <p>Conecta tu cuenta de Deriv de forma segura</p>
+
+  <a href="https://TU-APP.up.railway.app/login" class="btn" id="loginBtn">🔐 Iniciar sesión con Deriv</a>
+
+  <div class="status" id="status">Verificando sesión...</div>
+
+  <div id="tradingArea" style="display:none;margin-top:20px">
+    <button class="btn" style="background:#10b981" onclick="loadAccounts()">Ver mis cuentas</button>
+    <pre id="output" style="text-align:left;font-size:11px;background:#020408;padding:12px;border-radius:8px;margin-top:12px;max-height:200px;overflow:auto"></pre>
+  </div>
+</div>
+
+<script>
+// ⚠️ IMPORTANTE: Reemplaza esta URL con la que te dé Railway
+const BACKEND_URL = 'https://TU-APP.up.railway.app';
+
+(async () => {
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
+    const d = await r.json();
+    if (d.logged) {
+      document.getElementById('status').innerHTML = '<span class="ok">✅ Sesión activa en Deriv</span>';
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('tradingArea').style.display = 'block';
+    } else {
+      document.getElementById('status').textContent = 'No has iniciado sesión.';
+    }
+  } catch { document.getElementById('status').textContent = 'Error de conexión.'; }
+})();
+
+async function loadAccounts() {
+  const out = document.getElementById('output');
+  out.textContent = 'Cargando...';
+  try {
+    const r = await fetch(`${BACKEND_URL}/api/accounts`, { credentials: 'include' });
+    const d = await r.json();
+    out.textContent = JSON.stringify(d, null, 2);
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+</script>
+</body>
+</html>
