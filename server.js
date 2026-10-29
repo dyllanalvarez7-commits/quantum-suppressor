@@ -6,7 +6,7 @@ import cors from 'cors';
 
 const app = express();
 
-// ⚠️ IMPORTANTE: Tu URL de GitHub Pages
+// ⚠️ URL de tu GitHub Pages
 const FRONTEND_URL = 'https://dylallanavarez7-commits.github.io/quantum-suppressor';
 
 app.use(cors({
@@ -23,17 +23,16 @@ app.use(session({
   saveUninitialized: false,
   cookie: { 
     httpOnly: true, 
-    secure: true, // Requerido para HTTPS (Railway y GitHub usan HTTPS)
-    sameSite: 'none' // Permite que GitHub y Railway compartan la cookie
+    secure: true, // Requerido para HTTPS
+    sameSite: 'none' // Permite compartir cookies entre dominios
   }
 }));
 
 const CLIENT_ID = process.env.DERIV_CLIENT_ID || '33A0UhDa0Wa1FkvF9zlKh';
-const REDIRECT_URI = process.env.DERIV_REDIRECT_URI || 'https://digidiff-bot-produccion-0c43.up.railway.app/callback';
+const REDIRECT_URI = process.env.DERIV_REDIRECT_URI || 'https://quantum-suppressor-production.up.railway.app/callback';
 const DERIV_AUTH = 'https://auth.deriv.com/oauth2/auth';
 const DERIV_TOKEN = 'https://auth.deriv.com/oauth2/token';
 
-// 1) Redirigir a Deriv
 app.get('/login', (req, res) => {
   const codeVerifier = crypto.randomBytes(64).toString('base64url');
   const codeChallenge = crypto.createHash('sha256').update(codeVerifier).digest('base64url');
@@ -54,7 +53,6 @@ app.get('/login', (req, res) => {
   res.redirect(`${DERIV_AUTH}?${params}`);
 });
 
-// 2) Callback: Deriv devuelve el código aquí
 app.get('/callback', async (req, res) => {
   const { code, state, error } = req.query;
   
@@ -77,7 +75,6 @@ app.get('/callback', async (req, res) => {
     req.session.accessToken = data.access_token;
     delete req.session.pkce;
 
-    // Redirigir de vuelta a tu página de GitHub Pages
     res.redirect(FRONTEND_URL);
   } catch (e) {
     console.error(e.response?.data || e.message);
@@ -85,13 +82,11 @@ app.get('/callback', async (req, res) => {
   }
 });
 
-// 3) Verificar sesión
 app.get('/api/me', (req, res) => {
   if (!req.session.accessToken) return res.status(401).json({ logged: false });
   res.json({ logged: true });
 });
 
-// 4) Proxy para obtener cuentas
 app.get('/api/accounts', async (req, res) => {
   if (!req.session.accessToken) return res.status(401).json({ error: 'No autenticado' });
   try {
