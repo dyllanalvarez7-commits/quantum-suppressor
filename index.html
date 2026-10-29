@@ -3,59 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quantum Suppressor · Login</title>
+<title>Quantum Suppressor · Login Seguro</title>
 <style>
-  body { background:#05080f; color:#e2e8f0; font-family:sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; }
-  .card { background:#0d131f; border:1px solid #1f2a3f; border-radius:16px; padding:40px; max-width:420px; width:100%; text-align:center; }
-  h1 { background:linear-gradient(90deg,#06b6d4,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:24px; margin-bottom:10px;}
-  p { color:#64748b; font-size:14px; margin-bottom:20px; }
-  .btn { display:block; width:100%; padding:14px; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-weight:700; font-size:15px; cursor:pointer; margin-top:20px; text-decoration:none; box-sizing: border-box;}
-  .btn:hover { opacity:.9; }
-  .status { margin-top:16px; font-size:13px; color:#64748b; }
-  .ok { color:#10b981; }
+  body { background:#05080f; color:#e2e8f0; font-family:'Inter', sans-serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding: 20px; box-sizing: border-box;}
+  .card { background:#0d131f; border:1px solid #1f2a3f; border-radius:16px; padding:40px 30px; max-width:420px; width:100%; text-align:center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  h1 { background:linear-gradient(90deg,#06b6d4,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:26px; margin-bottom:10px; margin-top:0;}
+  p { color:#64748b; font-size:14px; margin-bottom:30px; line-height: 1.5;}
+  .btn { display:block; width:100%; padding:14px; background:#3b82f6; color:#fff; border:none; border-radius:8px; font-weight:700; font-size:15px; cursor:pointer; margin-top:20px; text-decoration:none; box-sizing: border-box; transition: 0.3s;}
+  .btn:hover { opacity:.9; transform: translateY(-2px); }
+  .btn-green { background:#10b981; }
+  .status { margin-top:20px; font-size:14px; color:#64748b; font-weight: 500;}
+  .ok { color:#10b981; font-weight: bold;}
+  pre { text-align:left; font-size:12px; background:#020408; padding:15px; border-radius:8px; border: 1px solid #1f2a3f; margin-top:20px; max-height:250px; overflow:auto; color: #06b6d4;}
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 <div class="card">
   <h1>⚡ QUANTUM SUPPRESSOR</h1>
-  <p>Conecta tu cuenta de Deriv de forma segura</p>
+  <p>Conecta tu cuenta de Deriv de forma 100% segura mediante OAuth.</p>
 
-  <a href="https://TU-APP.up.railway.app/login" class="btn" id="loginBtn">🔐 Iniciar sesión con Deriv</a>
+  <!-- Botón de Login apuntando a Railway -->
+  <a href="https://digidiff-bot-produccion-0c43.up.railway.app/login" class="btn" id="loginBtn">🔐 Iniciar sesión con Deriv</a>
 
-  <div class="status" id="status">Verificando sesión...</div>
+  <div class="status" id="status">Verificando estado de la sesión...</div>
 
-  <div id="tradingArea" style="display:none;margin-top:20px">
-    <button class="btn" style="background:#10b981" onclick="loadAccounts()">Ver mis cuentas</button>
-    <pre id="output" style="text-align:left;font-size:11px;background:#020408;padding:12px;border-radius:8px;margin-top:12px;max-height:200px;overflow:auto"></pre>
+  <div id="tradingArea" class="hidden">
+    <button class="btn btn-green" onclick="loadAccounts()">Ver mis cuentas conectadas</button>
+    <pre id="output"></pre>
   </div>
 </div>
 
 <script>
-// ⚠️ IMPORTANTE: Reemplaza esta URL con la que te dé Railway
-const BACKEND_URL = 'https://TU-APP.up.railway.app';
+// URL de tu backend en Railway
+const BACKEND_URL = 'https://digidiff-bot-produccion-0c43.up.railway.app';
 
 (async () => {
   try {
-    const r = await fetch(`${BACKEND_URL}/api/me`, { credentials: 'include' });
+    // Preguntamos a Railway si el usuario ya tiene una sesión activa
+    const r = await fetch(`${BACKEND_URL}/api/me`, { 
+      credentials: 'include' 
+    });
     const d = await r.json();
+    
     if (d.logged) {
-      document.getElementById('status').innerHTML = '<span class="ok">✅ Sesión activa en Deriv</span>';
-      document.getElementById('loginBtn').style.display = 'none';
-      document.getElementById('tradingArea').style.display = 'block';
+      document.getElementById('status').innerHTML = '<span class="ok">✅ Sesión activa y verificada</span>';
+      document.getElementById('loginBtn').classList.add('hidden');
+      document.getElementById('tradingArea').classList.remove('hidden');
     } else {
       document.getElementById('status').textContent = 'No has iniciado sesión.';
     }
-  } catch { document.getElementById('status').textContent = 'Error de conexión.'; }
+  } catch (error) { 
+    document.getElementById('status').textContent = 'Error de conexión con el servidor.';
+    console.error(error);
+  }
 })();
 
 async function loadAccounts() {
   const out = document.getElementById('output');
-  out.textContent = 'Cargando...';
+  out.textContent = 'Cargando datos de Deriv...';
+  
   try {
-    const r = await fetch(`${BACKEND_URL}/api/accounts`, { credentials: 'include' });
+    const r = await fetch(`${BACKEND_URL}/api/accounts`, { 
+      credentials: 'include' 
+    });
     const d = await r.json();
-    out.textContent = JSON.stringify(d, null, 2);
-  } catch (e) { out.textContent = 'Error: ' + e.message; }
+    
+    if(d.error) {
+        out.textContent = 'Error: ' + d.error;
+    } else {
+        out.textContent = JSON.stringify(d, null, 2);
+    }
+  } catch (e) { 
+    out.textContent = 'Error de red: ' + e.message; 
+  }
 }
 </script>
 </body>
