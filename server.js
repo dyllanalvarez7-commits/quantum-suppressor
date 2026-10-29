@@ -6,7 +6,7 @@ import cors from 'cors';
 
 const app = express();
 
-// ⚠️ IMPORTANTE: Reemplaza esto con la URL de tu GitHub Pages
+// ⚠️ IMPORTANTE: Tu URL de GitHub Pages
 const FRONTEND_URL = 'https://dylallanavarez7-commits.github.io/quantum-suppressor';
 
 app.use(cors({
@@ -28,8 +28,8 @@ app.use(session({
   }
 }));
 
-const CLIENT_ID = process.env.DERIV_CLIENT_ID || 'TU_CLIENT_ID_AQUI';
-const REDIRECT_URI = process.env.DERIV_REDIRECT_URI || 'https://tu-app.up.railway.app/callback';
+const CLIENT_ID = process.env.DERIV_CLIENT_ID || '33A0UhDa0Wa1FkvF9zlKh';
+const REDIRECT_URI = process.env.DERIV_REDIRECT_URI || 'https://digidiff-bot-produccion-0c43.up.railway.app/callback';
 const DERIV_AUTH = 'https://auth.deriv.com/oauth2/auth';
 const DERIV_TOKEN = 'https://auth.deriv.com/oauth2/token';
 
@@ -104,5 +104,5 @@ app.get('/api/accounts', async (req, res) => {
   }
 });
 
-app.get('/', (req, res) => res.send('Servidor Backend funcionando correctamente.'));
+app.get('/', (req, res) => res.send('Servidor Backend listo para OAuth.'));
 app.listen(process.env.PORT || 3000, () => console.log('Servidor en puerto', process.env.PORT || 3000));
