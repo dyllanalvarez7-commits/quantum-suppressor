@@ -23,8 +23,8 @@
   <h1>⚡ QUANTUM SUPPRESSOR</h1>
   <p>Conecta tu cuenta de Deriv de forma 100% segura mediante OAuth.</p>
 
-  <!-- Botón de Login apuntando a Railway -->
-  <a href="https://digidiff-bot-produccion-0c43.up.railway.app/login" class="btn" id="loginBtn">🔐 Iniciar sesión con Deriv</a>
+  <!-- Botón actualizado a la nueva URL de Railway -->
+  <a href="https://quantum-suppressor-production.up.railway.app/login" class="btn" id="loginBtn">🔐 Iniciar sesión con Deriv</a>
 
   <div class="status" id="status">Verificando estado de la sesión...</div>
 
@@ -35,12 +35,11 @@
 </div>
 
 <script>
-// URL de tu backend en Railway
-const BACKEND_URL = 'https://digidiff-bot-produccion-0c43.up.railway.app';
+// Nueva URL del backend en Railway
+const BACKEND_URL = 'https://quantum-suppressor-production.up.railway.app';
 
 (async () => {
   try {
-    // Preguntamos a Railway si el usuario ya tiene una sesión activa
     const r = await fetch(`${BACKEND_URL}/api/me`, { 
       credentials: 'include' 
     });
